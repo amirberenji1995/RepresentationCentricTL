@@ -340,3 +340,56 @@ def load_best_params_lookup(file_path="best_params.jsonl"):
             data = json.loads(line)
             lookup[data["description"]] = data
     return lookup
+
+
+def torch_sampler(
+    x: torch.Tensor,
+    y: torch.Tensor,
+    rnd_state: int,
+    subsampling_style: Literal["percentage", "shots_per_class"],
+    subsampling_factor: float,
+):
+    def p_subsampler_torch(
+        x: torch.Tensor,
+        y: torch.Tensor,
+        rnd_state: int,
+        p: float = 0.01,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        n = x.size(0)
+        k = int(n * p)
+
+        gen = torch.Generator(device=x.device)
+        gen.manual_seed(rnd_state)
+
+        idx = torch.randperm(n, generator=gen, device=x.device)[:k]
+
+        return x[idx], y[idx]
+
+    def s_subsampler_torch(
+        x: torch.Tensor,
+        y: torch.Tensor,
+        rnd_state: int,
+        shots: int,
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        unique_classes = torch.unique(y)
+        gen = torch.Generator(device=x.device).manual_seed(rnd_state)
+
+        indices = []
+        for c in unique_classes:
+            # Get indices for the current class
+            cls_indices = (y == c).nonzero(as_tuple=True)[0]
+
+            # Shuffle and pick the first 'n' shots
+            perm = torch.randperm(len(cls_indices), generator=gen, device=x.device)
+            indices.append(cls_indices[perm[:shots]])
+
+        # Concatenate and sort to preserve original order (optional but cleaner)
+        final_idx = torch.cat(indices).sort()[0]
+        return x[final_idx], y[final_idx]
+
+    if subsampling_style == "percentage":
+        return p_subsampler_torch(x, y, rnd_state, subsampling_factor)
+    elif subsampling_style == "shots_per_class":
+        return s_subsampler_torch(x, y, rnd_state, int(subsampling_factor))
+    else:
+        raise ValueError(f"Invalid style: {subsampling_style}")

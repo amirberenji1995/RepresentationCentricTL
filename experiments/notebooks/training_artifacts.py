@@ -2,7 +2,11 @@ from easy_torchkit.src.early_stopping import StoppingCriteria, EffectiveSet
 from easy_torchkit.src.configurations import EvaluationMetric, TrainingPhaseType
 from sklearn.metrics import accuracy_score
 import torch
-from easy_torchkit.src.utils import supervised_step
+from easy_torchkit.src.utils import (
+    supervised_step,
+    contrastive_step,
+    dynamic_bootstrapping_step,
+)
 
 criteria_list = [
     StoppingCriteria(
@@ -40,4 +44,13 @@ fine_tuning_params_dict = {
     "phase": TrainingPhaseType.fine_tuning,
     "print_every": 1000,
     "stopping_criteria": criteria_list,
+}
+
+training_params_step_dict = {
+    "training": training_params_dict,
+    "fine_tuning": {
+        "supervised": fine_tuning_params_dict,
+        "contrastive": {},
+        "dynamic_bootstrapping": {},
+    },
 }

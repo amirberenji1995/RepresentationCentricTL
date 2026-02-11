@@ -17,81 +17,100 @@ def process_jsonl_to_dfs(jsonl_path):
                 continue
             title = data["title"].strip()
 
-            # 1. Source Training Averages
-            src_accs = {}
-            for src, reps in data["results"].items():
-                acc_only_reps = [
-                    {ds: m["Accuracy"] for ds, m in r.items()} for r in reps
-                ]
-                src_accs[src] = pd.DataFrame(acc_only_reps).mean()
+            # 1. Source Training Averages (Accuracy)
+            src_accs = {
+                src: pd.DataFrame(
+                    [{ds: m["Accuracy"] for ds, m in r.items()} for r in reps]
+                ).mean()
+                for src, reps in data["results"].items()
+            }
             df_src = pd.DataFrame(src_accs).T
 
-            # 2. Fine-Tuning Averages
+            # 2. Fine-Tuning Averages (Accuracy)
             ft_records = []
             for src, targets in data["fine_tuning_results"].items():
                 for tgt, reps in targets.items():
-                    acc_only_reps = [
-                        {ds: m["Accuracy"] for ds, m in r.items()} for r in reps
-                    ]
-                    row = pd.DataFrame(acc_only_reps).mean().to_dict()
-                    row["Source"] = src
-                    row["FT_Target"] = tgt
+                    row = (
+                        pd.DataFrame(
+                            [{ds: m["Accuracy"] for ds, m in r.items()} for r in reps]
+                        )
+                        .mean()
+                        .to_dict()
+                    )
+                    row.update({"Source": src, "FT_Target": tgt})
                     ft_records.append(row)
-
-            if not ft_records:
-                continue
             df_ft = pd.DataFrame(ft_records).set_index(["Source", "FT_Target"])
 
-            # 3. Construct Tables
-            rows_absolute = []
-            rows_diff = []
+            # 3. Timing Averages
+            src_time = {
+                src: pd.DataFrame(reps).mean()
+                for src, reps in data.get("source_timing_raw", {}).items()
+            }
+            df_src_time = pd.DataFrame(src_time).T
+
+            ft_time_recs = []
+            for src, targets in data.get("fine_tuning_timing_raw", {}).items():
+                for tgt, reps in targets.items():
+                    row = pd.DataFrame(reps).mean().to_dict()
+                    row.update({"Source": src, "FT_Target": tgt})
+                    ft_time_recs.append(row)
+            df_ft_time = pd.DataFrame(ft_time_recs).set_index(["Source", "FT_Target"])
+
+            # 4. Construct Tables
+            rows_perf = []
+            rows_time = []
             for src in datasets:
                 for tgt in [d for d in datasets if d != src]:
-                    # Values
-                    t_mfpt, t_cwru, t_kaist = (
-                        df_src.loc[src, "mfpt"],
-                        df_src.loc[src, "cwru"],
-                        df_src.loc[src, "kaist"],
-                    )
-                    f_mfpt, f_cwru, f_kaist = (
-                        df_ft.loc[(src, tgt), "mfpt"],
-                        df_ft.loc[(src, tgt), "cwru"],
-                        df_ft.loc[(src, tgt), "kaist"],
-                    )
-
-                    base_info = {"Source": src.upper(), "FT_Target": tgt.upper()}
-
-                    # Absolute Data
-                    rows_absolute.append(
+                    # Performance Row (Fixed Column Alignment)
+                    rows_perf.append(
                         {
-                            **base_info,
-                            "train_mfpt": t_mfpt,
-                            "train_cwru": t_cwru,
-                            "train_kaist": t_kaist,
-                            "ft_mfpt": f_mfpt,
-                            "ft_cwru": f_cwru,
-                            "ft_kaist": f_kaist,
+                            "Source": src.upper(),
+                            "T_MFPT": df_src.loc[src, "mfpt"],
+                            "T_CWRU": df_src.loc[src, "cwru"],
+                            "T_KAIST": df_src.loc[src, "kaist"],
+                            "FT_Target": tgt.upper(),
+                            "Abs_MFPT": df_ft.loc[(src, tgt), "mfpt"],
+                            "Abs_CWRU": df_ft.loc[(src, tgt), "cwru"],
+                            "Abs_KAIST": df_ft.loc[(src, tgt), "kaist"],
+                            "Diff_MFPT": df_ft.loc[(src, tgt), "mfpt"]
+                            - df_src.loc[src, "mfpt"],
+                            "Diff_CWRU": df_ft.loc[(src, tgt), "cwru"]
+                            - df_src.loc[src, "cwru"],
+                            "Diff_KAIST": df_ft.loc[(src, tgt), "kaist"]
+                            - df_src.loc[src, "kaist"],
                         }
                     )
-
-                    # Difference Data (FT - Training)
-                    rows_diff.append(
+                    # Timing Row
+                    rows_time.append(
                         {
-                            **base_info,
-                            "diff_mfpt": f_mfpt - t_mfpt,
-                            "diff_cwru": f_cwru - t_cwru,
-                            "diff_kaist": f_kaist - t_kaist,
+                            "Source": src.upper(),
+                            "Src_Total": df_src_time.loc[src, "total_time"]
+                            if src in df_src_time.index
+                            else 0,
+                            "Src_Avg": df_src_time.loc[src, "average_epoch_time"]
+                            if src in df_src_time.index
+                            else 0,
+                            "FT_Target": tgt.upper(),
+                            "FT_Total": df_ft_time.loc[(src, tgt), "total_time"]
+                            if (src, tgt) in df_ft_time.index
+                            else 0,
+                            "FT_Avg": df_ft_time.loc[(src, tgt), "average_epoch_time"]
+                            if (src, tgt) in df_ft_time.index
+                            else 0,
                         }
                     )
 
             routines_dict[title] = {
-                "absolute": pd.DataFrame(rows_absolute),
-                "difference": pd.DataFrame(rows_diff),
+                "performance": pd.DataFrame(rows_perf),
+                "timing": pd.DataFrame(rows_time),
             }
     return routines_dict
 
 
 def write_grid_to_sheet(worksheet, df_dict, layout, mode, start_row_offset, workbook):
+    # Colors
+    c_red, c_orange, c_green = "#F8696B", "#FBAF5D", "#63BE7B"
+
     # Styles
     title_fmt = workbook.add_format(
         {
@@ -125,7 +144,8 @@ def write_grid_to_sheet(worksheet, df_dict, layout, mode, start_row_offset, work
         }
     )
 
-    R_GRID_OFFSET, C_GRID_OFFSET = 16, 10
+    R_GRID_OFFSET = 18 if mode == "performance" else 15
+    C_GRID_OFFSET = 12 if mode == "performance" else 8
 
     for (grid_r, grid_c), title in layout.items():
         if title not in df_dict:
@@ -136,32 +156,37 @@ def write_grid_to_sheet(worksheet, df_dict, layout, mode, start_row_offset, work
             grid_c * C_GRID_OFFSET,
         )
 
-        # Headers
-        worksheet.merge_range(
-            s_row,
-            s_col,
-            s_row,
-            s_col + (7 if mode == "absolute" else 4),
-            title,
-            title_fmt,
-        )
-
-        if mode == "absolute":
-            worksheet.merge_range(
-                s_row + 1, s_col, s_row + 1, s_col, "Info", header_fmt
-            )
+        if mode == "performance":
+            worksheet.merge_range(s_row, s_col, s_row, s_col + 10, title, title_fmt)
+            # Level 1
+            worksheet.write(s_row + 1, s_col, "Info", header_fmt)
             worksheet.merge_range(
                 s_row + 1, s_col + 1, s_row + 1, s_col + 3, "Training Phase", header_fmt
             )
-            worksheet.merge_range(
-                s_row + 1, s_col + 4, s_row + 1, s_col + 4, "Info", header_fmt
-            )
+            worksheet.write(s_row + 1, s_col + 4, "Info", header_fmt)
             worksheet.merge_range(
                 s_row + 1,
                 s_col + 5,
                 s_row + 1,
-                s_col + 7,
+                s_col + 10,
                 "Fine-Tuning Phase",
+                header_fmt,
+            )
+            # Level 2
+            worksheet.merge_range(
+                s_row + 2,
+                s_col + 5,
+                s_row + 2,
+                s_col + 7,
+                "Absolute Accuracy",
+                header_fmt,
+            )
+            worksheet.merge_range(
+                s_row + 2,
+                s_col + 8,
+                s_row + 2,
+                s_col + 10,
+                "Improvement (Δ)",
                 header_fmt,
             )
             cols = [
@@ -173,72 +198,112 @@ def write_grid_to_sheet(worksheet, df_dict, layout, mode, start_row_offset, work
                 "MFPT",
                 "CWRU",
                 "KAIST",
+                "MFPT",
+                "CWRU",
+                "KAIST",
             ]
+            header_row = s_row + 3
         else:
+            worksheet.merge_range(s_row, s_col, s_row, s_col + 5, title, title_fmt)
+            worksheet.write(s_row + 1, s_col, "Info", header_fmt)
             worksheet.merge_range(
-                s_row + 1, s_col, s_row + 1, s_col + 1, "Info", header_fmt
-            )
-            worksheet.merge_range(
+                s_row + 1,
+                s_col + 1,
                 s_row + 1,
                 s_col + 2,
-                s_row + 1,
-                s_col + 4,
-                "Fine-Tuning Improvement (Δ)",
+                "Source Training Time",
                 header_fmt,
             )
-            cols = ["Source", "FT Target", "MFPT", "CWRU", "KAIST"]
+            worksheet.write(s_row + 1, s_col + 3, "Info", header_fmt)
+            worksheet.merge_range(
+                s_row + 1,
+                s_col + 4,
+                s_row + 1,
+                s_col + 5,
+                "Fine-Tuning Time",
+                header_fmt,
+            )
+            cols = ["Source", "Total (s)", "Avg/Ep", "FT Target", "Total (s)", "Avg/Ep"]
+            header_row = s_row + 2
 
         for i, col_name in enumerate(cols):
-            worksheet.write(s_row + 2, s_col + i, col_name, header_fmt)
+            worksheet.write(header_row, s_col + i, col_name, header_fmt)
 
-        # Data
-        data_start = s_row + 3
+        data_start = header_row + 1
         for i in range(len(df)):
             for j in range(len(cols)):
-                val = df.iloc[i, j]
-                worksheet.write(data_start + i, s_col + j, val, cell_fmt)
+                worksheet.write(data_start + i, s_col + j, df.iloc[i, j], cell_fmt)
 
-        # Merging Source (and Training if absolute)
+        # Merge Blocks
         for i in range(0, len(df), 2):
-            if i + 1 < len(df):
-                worksheet.merge_range(
-                    data_start + i,
-                    s_col,
-                    data_start + i + 1,
-                    s_col,
-                    df.iloc[i, 0],
-                    merge_fmt,
-                )
-                if mode == "absolute":
-                    for c in range(1, 4):
-                        worksheet.merge_range(
-                            data_start + i,
-                            s_col + c,
-                            data_start + i + 1,
-                            s_col + c,
-                            df.iloc[i, c],
-                            merge_fmt,
-                        )
+            worksheet.merge_range(
+                data_start + i,
+                s_col,
+                data_start + i + 1,
+                s_col,
+                df.iloc[i, 0],
+                merge_fmt,
+            )
+            if mode == "performance":
+                for c in range(1, 4):
+                    worksheet.merge_range(
+                        data_start + i,
+                        s_col + c,
+                        data_start + i + 1,
+                        s_col + c,
+                        df.iloc[i, c],
+                        merge_fmt,
+                    )
+            else:
+                for c in range(1, 3):
+                    worksheet.merge_range(
+                        data_start + i,
+                        s_col + c,
+                        data_start + i + 1,
+                        s_col + c,
+                        df.iloc[i, c],
+                        merge_fmt,
+                    )
 
-        # Heatmap
-        h_ranges = [(1, 3), (5, 7)] if mode == "absolute" else [(2, 4)]
-        for r_start, r_end in h_ranges:
+        # Aesthetic Heatmaps
+        if mode == "performance":
+            # 1) Absolute Ranges (0, 0.5, 1)
+            for r_start, r_end in [(1, 3), (5, 7)]:
+                worksheet.conditional_format(
+                    data_start,
+                    s_col + r_start,
+                    data_start + 5,
+                    s_col + r_end,
+                    {
+                        "type": "3_color_scale",
+                        "min_color": c_red,
+                        "mid_color": c_orange,
+                        "max_color": c_green,
+                        "min_type": "num",
+                        "min_value": 0,
+                        "mid_type": "num",
+                        "mid_value": 0.5,
+                        "max_type": "num",
+                        "max_value": 1,
+                    },
+                )
+            # 2) Delta Ranges (-0.5, 0, 0.5)
             worksheet.conditional_format(
                 data_start,
-                s_col + r_start,
-                data_start + len(df) - 1,
-                s_col + r_end,
+                s_col + 8,
+                data_start + 5,
+                s_col + 10,
                 {
                     "type": "3_color_scale",
-                    "min_color": "#F8696B",
-                    "mid_color": "#FFEB84",
-                    "max_color": "#63BE7B",
+                    "min_color": c_red,
+                    "mid_color": c_orange,
+                    "max_color": c_green,
                     "min_type": "num",
-                    "min_value": -0.5 if mode == "difference" else 0,
+                    "min_value": -1,
                     "mid_type": "num",
-                    "mid_value": 0 if mode == "difference" else 0.5,
+                    "mid_value": 0,
                     "max_type": "num",
-                    "max_value": 0.5 if mode == "difference" else 1,
+                    "max_value": 1,
                 },
             )
 
@@ -247,26 +312,22 @@ def export_to_xlsx(routines_dict, layout, output_path, source_filename):
     writer = pd.ExcelWriter(output_path, engine="xlsxwriter")
     workbook = writer.book
     src_fmt = workbook.add_format(
-        {"bold": True, "font_size": 14, "font_color": "#44546A"}
+        {"bold": True, "font_size": 12, "font_color": "#44546A"}
     )
 
-    for sheet_name, mode in [("Results", "absolute"), ("Difference", "difference")]:
+    for sheet_name, mode in [("Performance", "performance"), ("Timing", "timing")]:
         worksheet = workbook.add_worksheet(sheet_name)
         worksheet.write(0, 0, f"Source File: {source_filename}", src_fmt)
         write_grid_to_sheet(worksheet, routines_dict, layout, mode, 2, workbook)
-        worksheet.set_column(0, 50, 12)
-
+        worksheet.set_column(0, 100, 12)
     writer.close()
 
 
 if __name__ == "__main__":
     files = [
-        "experiments/notebooks/results/full_results.jsonl",
-        "experiments/notebooks/results_p_01/full_results_p_01.jsonl",
-        "experiments/notebooks/results_p_005/full_results_p_005.jsonl",
-        "experiments/notebooks/results_p_001/full_results_p_001.jsonl",
+        "experiments/notebooks/results/results_fs_supervised_ss_None_sp_None/_fs_supervised_ss_None_sp_None.jsonl",
     ]
-    output_dir = "experiments/notebooks/summarized_results/"
+    output_dir = "experiments/notebooks/results/results_fs_supervised_ss_None_sp_None/"
     os.makedirs(output_dir, exist_ok=True)
 
     routine_layout = {
@@ -295,7 +356,9 @@ if __name__ == "__main__":
         export_to_xlsx(
             data_dfs,
             routine_layout,
-            os.path.join(output_dir, f"Summary{p_suffix}.xlsx"),
+            os.path.join(
+                output_dir, f"summarized{path.name.split('/')[-1].split('.')[0]}.xlsx"
+            ),
             path.name,
         )
 

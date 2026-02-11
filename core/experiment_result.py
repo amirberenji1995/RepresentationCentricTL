@@ -19,13 +19,37 @@ class ExperimentResult(BaseModel):
     random_states: List[int] = Field(default_factory=list)
     results: Dict[str, List[Dict[str, Any]]] = Field(default_factory=dict)
     models: Dict[str, Any] = Field(default_factory=dict)
+    terminations: Dict[str, Any] = Field(default_factory=dict)
     experiment_type: ExperimentType = Field(default=ExperimentType.TRAINING)
-    fine_tuning_results: Dict[str, List[Dict[str, Any]]] = Field(default_factory=dict)
-    fine_tuning_models: Dict[str, Any] = Field(default_factory=dict)
+    fine_tuning_results: Dict[str, Dict[str, List[Dict[str, Any]]]] = Field(
+        default_factory=dict
+    )
+    fine_tuning_models: Dict[str, Dict[str, List[Dict[str, Any]]]] = Field(
+        default_factory=dict
+    )
+    fine_tuning_terminations: Dict[str, Any] = Field(default_factory=dict)
+    fine_tuning_style: Literal["supervised", "contrastive", "dynamic_bootstrapping"] = (
+        "supervised"
+    )
+    subsampling_style: Literal["percentage", "shots_per_class", None] = None
+    subsampling_factor: float | None = None
+    source_timing_raw: Dict[str, List[Dict[str, float]]] = Field(default_factory=dict)
+    fine_tuning_timing_raw: Dict[str, Dict[str, List[Dict[str, float]]]] = Field(
+        default_factory=dict
+    )
+    best_params: Dict[str, Any] = Field(default_factory=dict)
 
     def model_post_init(self, __context):
         if not self.random_states:
             self.random_states = np.random.randint(0, 100, self.reps).tolist()
+
+        if not self.source_timing_raw:
+            self.source_timing_raw = {ds: [] for ds in ["mfpt", "cwru", "kaist"]}
+        if not self.fine_tuning_timing_raw:
+            self.fine_tuning_timing_raw = {
+                src: {tgt: [] for tgt in ["mfpt", "cwru", "kaist"] if tgt != src}
+                for src in ["mfpt", "cwru", "kaist"]
+            }
 
     def log_to_jsonl(
         self, log_file="best_params.jsonl", exclude: Optional[List[str]] = None
@@ -137,17 +161,8 @@ class ExperimentResult(BaseModel):
     def get_training_time_summary(
         self, format: Literal["dictionary", "dataframe"] = "dictionary"
     ):
-        timing_summary = {}
-
-        for ds in self.models.keys():
-            timing_summary[ds] = []
-            for item in self.models[ds]:
-                timing_summary[ds].append(
-                    {
-                        "total_time": item.history[-1].total_time,
-                        "average_epoch_time": item.history[-1].average_epoch_time,
-                    }
-                )
+        # Use source_timing_raw as the primary source of truth
+        timing_summary = self.source_timing_raw
 
         if format == "dictionary":
             return timing_summary
@@ -155,66 +170,38 @@ class ExperimentResult(BaseModel):
             return pd.DataFrame(
                 [
                     {
-                        "training_dataset": dataset_name.upper(),
+                        "training_dataset": ds.upper(),
                         "total_time": entry["total_time"],
                         "average_epoch_time": entry["average_epoch_time"],
                     }
-                    for dataset_name, entries in timing_summary.items()
+                    for ds, entries in timing_summary.items()
                     for entry in entries
                 ]
             )
         else:
             raise ValueError(f"Invalid format: {format}")
-
-    @property
-    def training_time_mean(self):
-        # Now calling it as a method with ()
-        return (
-            self.get_training_time_summary(format="dataframe")
-            .groupby("training_dataset", as_index=False)
-            .mean()
-        )
 
     def get_fine_tuning_time_summary(
         self, format: Literal["dictionary", "dataframe"] = "dictionary"
     ):
-        timing_summary = {}
-        for train_set in self.fine_tuning_models.keys():
-            timing_summary[train_set] = {}
-            for fine_tuning_set in self.fine_tuning_models[train_set].keys():
-                timing_summary[train_set][fine_tuning_set] = []
-                for item in self.fine_tuning_models[train_set][fine_tuning_set]:
-                    timing_summary[train_set][fine_tuning_set].append(
-                        {
-                            "total_time": item.history[-1].total_time,
-                            "average_epoch_time": item.history[-1].average_epoch_time,
-                        }
-                    )
+        # Use fine_tuning_timing_raw as the primary source of truth
+        timing_data = self.fine_tuning_timing_raw
 
         if format == "dictionary":
-            return timing_summary
+            return timing_data
         elif format == "dataframe":
-            return pd.DataFrame(
-                [
-                    {
-                        "training_dataset": train_set.upper(),
-                        "fine_tuning_dataset": fine_tuning_set.upper(),
-                        "total_time": entry["total_time"],
-                        "average_epoch_time": entry["average_epoch_time"],
-                    }
-                    for train_set, fine_tuning_sets in timing_summary.items()
-                    for fine_tuning_set, entries in fine_tuning_sets.items()
-                    for entry in entries
-                ]
-            )
+            rows = []
+            for src, targets in timing_data.items():
+                for tgt, entries in targets.items():
+                    for entry in entries:
+                        rows.append(
+                            {
+                                "training_dataset": src.upper(),
+                                "fine_tuning_dataset": tgt.upper(),
+                                "total_time": entry["total_time"],
+                                "average_epoch_time": entry["average_epoch_time"],
+                            }
+                        )
+            return pd.DataFrame(rows)
         else:
             raise ValueError(f"Invalid format: {format}")
-
-    @property
-    def fine_tuning_time_mean(self):
-        # Now calling it as a method with ()
-        return (
-            self.get_fine_tuning_time_summary(format="dataframe")
-            .groupby(["training_dataset", "fine_tuning_dataset"], as_index=False)
-            .mean()
-        )
