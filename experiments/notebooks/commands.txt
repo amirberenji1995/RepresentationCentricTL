@@ -1,9 +1,9 @@
 ### Best parameters discovery ###
 
 python best_params_new.py --workers 12
-python best_params_new.py --phase fine_tuning --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.1
 python best_params_new.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.1
-python best_params_new.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.05 --device cuda:1
+python best_params_new.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.05
+python best_params_new.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.01
 
 python best_params_new.py --phase fine_tuning --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 25
 python best_params_new.py --phase fine_tuning --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 20
@@ -16,3 +16,9 @@ python training_new.py --device cuda:0 --workers 12 --best_params_file /home/a/a
 python training_new.py --device cuda:0 --workers 12 --subsampling_style percentage --subsampling_factor 0.1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_percentage_sp_01.jsonl
 python training_new.py --device cuda:1 --workers 12 --subsampling_style percentage --subsampling_factor 0.05 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_percentage_sp_005.jsonl
 python training_new.py --device cuda:1 --workers 12 --subsampling_style percentage --subsampling_factor 0.01 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_percentage_sp_001.jsonl
+
+python training_new.py --device cuda:0 --workers 12 --subsampling_style shots_per_class --subsampling_factor 5 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_shots_per_class_sp_50.jsonl
+python training_new.py --device cuda:0 --workers 12 --subsampling_style shots_per_class --subsampling_factor 10 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_shots_per_class_sp_100.jsonl
+python training_new.py --device cuda:0 --workers 12 --subsampling_style shots_per_class --subsampling_factor 15 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_shots_per_class_sp_150.jsonl
+python training_new.py --device cuda:1 --workers 12 --subsampling_style shots_per_class --subsampling_factor 20 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_shots_per_class_sp_200.jsonl
+python training_new.py --device cuda:1 --workers 12 --subsampling_style shots_per_class --subsampling_factor 25 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_shots_per_class_sp_250.jsonl

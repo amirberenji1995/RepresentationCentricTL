@@ -326,8 +326,16 @@ def export_to_xlsx(routines_dict, layout, output_path, source_filename):
 if __name__ == "__main__":
     files = [
         "experiments/notebooks/results/results_fs_supervised_ss_None_sp_None/_fs_supervised_ss_None_sp_None.jsonl",
+        "experiments/notebooks/results/results_fs_supervised_ss_percentage_sp_01/_fs_supervised_ss_percentage_sp_01.jsonl",
+        "experiments/notebooks/results/results_fs_supervised_ss_percentage_sp_005/_fs_supervised_ss_percentage_sp_005.jsonl",
+        "experiments/notebooks/results/results_fs_supervised_ss_percentage_sp_001/_fs_supervised_ss_percentage_sp_001.jsonl",
+        "experiments/notebooks/results/results_fs_supervised_ss_shots_per_class_sp_50/_fs_supervised_ss_shots_per_class_sp_50.jsonl",
+        "experiments/notebooks/results/results_fs_supervised_ss_shots_per_class_sp_100/_fs_supervised_ss_shots_per_class_sp_100.jsonl",
+        "experiments/notebooks/results/results_fs_supervised_ss_shots_per_class_sp_150/_fs_supervised_ss_shots_per_class_sp_150.jsonl",
+        "experiments/notebooks/results/results_fs_supervised_ss_shots_per_class_sp_200/_fs_supervised_ss_shots_per_class_sp_200.jsonl",
+        "experiments/notebooks/results/results_fs_supervised_ss_shots_per_class_sp_250/_fs_supervised_ss_shots_per_class_sp_250.jsonl",
     ]
-    output_dir = "experiments/notebooks/results/results_fs_supervised_ss_None_sp_None/"
+    output_dir = "experiments/notebooks/results/summarized/"
     os.makedirs(output_dir, exist_ok=True)
 
     routine_layout = {
