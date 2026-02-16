@@ -1,8 +1,6 @@
 import optuna
 from optuna.samplers import GridSampler
-from easy_torchkit.src.configurations import (
-    TrainingParams,
-)
+from easy_torchkit.src.contracts.training_params import TrainingParams
 import torch
 from easy_torchkit.src.classification import ClassificationModel
 from typing import Literal, Dict, List, Any
@@ -38,7 +36,9 @@ def tune_source_phase(
 
         trial_model = model.copy(reset_history=True)
 
-        print(f"DEBUG: Data shapes -> x_train: {train_x.shape}, y_train: {train_y.shape}")
+        print(
+            f"DEBUG: Data shapes -> x_train: {train_x.shape}, y_train: {train_y.shape}"
+        )
 
         trial_model.fit(train_x, train_y, training_params)
 

@@ -20,7 +20,7 @@ from core.utils import (
     torch_sampler,
     train_test_splitter,
 )
-from easy_torchkit.src.configurations import TrainingParams
+from easy_torchkit.src.contracts.training_params import TrainingParams
 from experiments.notebooks.training_artifacts import training_params_step_dict
 import argparse
 import torch
@@ -31,7 +31,9 @@ import gc
 # ---------------------------------------------------------
 # 1. ARGPARSE FOR TERMINAL CONTROL
 # ---------------------------------------------------------
-parser = argparse.ArgumentParser(description="Run Experiments using the best hyperparameters, repetitively")
+parser = argparse.ArgumentParser(
+    description="Run Experiments using the best hyperparameters, repetitively"
+)
 
 parser.add_argument(
     "--best_params_file",

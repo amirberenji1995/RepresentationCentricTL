@@ -8,7 +8,7 @@ if project_root not in sys.path:
 import argparse
 from typing import Literal
 import time
-from easy_torchkit.src.configurations import TrainingParams
+from easy_torchkit.src.contracts.training_params import TrainingParams
 import numpy as np
 import torch
 import gc  # Added for garbage collection

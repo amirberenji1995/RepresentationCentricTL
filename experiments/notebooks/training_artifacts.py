@@ -1,12 +1,13 @@
 from easy_torchkit.src.early_stopping import StoppingCriteria, EffectiveSet
-from easy_torchkit.src.configurations import EvaluationMetric, TrainingPhaseType
+from easy_torchkit.src.contracts.configurations import (
+    EvaluationMetric,
+    TrainingPhaseType,
+)
+from easy_torchkit.src.training_steps.supervised_training_step import (
+    SupervisedTrainingStep,
+)
 from sklearn.metrics import accuracy_score
 import torch
-from easy_torchkit.src.utils import (
-    supervised_step,
-    contrastive_step,
-    dynamic_bootstrapping_step,
-)
 
 criteria_list = [
     StoppingCriteria(
@@ -22,12 +23,12 @@ criteria_list = [
 accuracy_metric = EvaluationMetric(name="accuracy", function=accuracy_score)
 
 training_params_dict = {
-    "epochs": 1000,
+    "epochs": 5,
     "val_size": 0.25,
     "metrics": [accuracy_metric],
     "loss_fn": torch.nn.CrossEntropyLoss(reduction="mean"),
     "optimizer": torch.optim.Adam,
-    "training_step": supervised_step,
+    "training_step": SupervisedTrainingStep(),
     "phase": TrainingPhaseType.training,
     "print_every": 1000,
     "stopping_criteria": criteria_list,
@@ -35,12 +36,12 @@ training_params_dict = {
 
 
 fine_tuning_params_dict = {
-    "epochs": 1000,
+    "epochs": 5,
     "val_size": 0.25,
     "metrics": [accuracy_metric],
     "loss_fn": torch.nn.CrossEntropyLoss(reduction="mean"),
     "optimizer": torch.optim.Adam,
-    "training_step": supervised_step,
+    "training_step": SupervisedTrainingStep(),
     "phase": TrainingPhaseType.fine_tuning,
     "print_every": 1000,
     "stopping_criteria": criteria_list,

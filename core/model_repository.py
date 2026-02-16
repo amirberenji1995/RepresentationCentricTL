@@ -77,7 +77,7 @@ class LSTMClassifier(ClassificationModel):
     ) -> torch.Tensor:
         if x.ndim == 2:
             x = x.unsqueeze(1)
-        
+
         lstm_out, (hn, cn) = self.lstm(x)
 
         # Use the last time step's output
