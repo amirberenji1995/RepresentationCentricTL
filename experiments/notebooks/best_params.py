@@ -244,7 +244,14 @@ def execute_routine(routine_key):
                     )
 
                 elif FINE_TUNING_STYLE == "contrastive":
-                    raise NotImplementedError
+                    ft_params, _, fine_tuning_study = tune_fine_tuning_phase(
+                        best_models_in_routine[src_name],
+                        tgt_name,
+                        x_target_tensor,
+                        y_target,
+                        routine.training_best_params_ranges,
+                        training_params_step_dict["fine_tuning"]["contrastive"],
+                    )
 
                 elif FINE_TUNING_STYLE == "dynamic_bootstrapping":
                     raise NotImplementedError
@@ -272,14 +279,10 @@ def execute_routine(routine_key):
             training_study_details=training_study_details,
             fine_tuning_study_details=extract_study_data(fine_tuning_study),
         )
-
         p_suffix = (
-            f"_ds_{str(PHASE).replace('.', '')}"
-            f"_fs_{str(FINE_TUNING_STYLE).replace('.', '')}"
-            f"_ss_{str(SUBSAMPLING_STYLE).replace('.', '')}"
+            f"_fs_{str(FINE_TUNING_STYLE)}"
+            f"_ss_{str(SUBSAMPLING_STYLE)}"
             f"_sp_{str(SUBSAMPLING_FACTOR).replace('.', '')}"
-            if SUBSAMPLING_FACTOR and SUBSAMPLING_STYLE
-            else ""
         )
         bp.log_to_jsonl(
             log_file=f"{output_dir}/best_params{p_suffix}.jsonl",

@@ -6,6 +6,10 @@ from easy_torchkit.src.contracts.configurations import (
 from easy_torchkit.src.training_steps.supervised_training_step import (
     SupervisedTrainingStep,
 )
+from easy_torchkit.src.training_steps.siamese_training_step import (
+    ContrastiveLoss,
+    SiameseTrainingStep,
+)
 from sklearn.metrics import accuracy_score
 import torch
 
@@ -51,7 +55,16 @@ training_params_step_dict = {
     "training": training_params_dict,
     "fine_tuning": {
         "supervised": fine_tuning_params_dict,
-        "contrastive": {},
+        "contrastive": {
+            "epochs": 5,
+            "val_size": 0.25,
+            "loss_fn": ContrastiveLoss(margin=1.0),
+            "optimizer": torch.optim.Adam,
+            "training_step": SiameseTrainingStep(),
+            "phase": TrainingPhaseType.fine_tuning,
+            "print_every": 1000,
+            "stopping_criteria": criteria_list,
+        },
         "dynamic_bootstrapping": {},
     },
 }
