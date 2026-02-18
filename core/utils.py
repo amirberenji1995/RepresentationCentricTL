@@ -393,3 +393,50 @@ def torch_sampler(
         return s_subsampler_torch(x, y, rnd_state, int(subsampling_factor))
     else:
         raise ValueError(f"Invalid style: {subsampling_style}")
+
+
+def make_contrastive_pairs(
+    x: torch.Tensor,
+    y: torch.Tensor,
+    pairs_per_sample: int = 1,
+):
+    """
+    Returns:
+        pair_x: [N_pairs, 2, input_dim]
+        pair_y: [N_pairs] (1 = similar, 0 = dissimilar)
+    """
+    device = x.device
+    pair_x = []
+    pair_y = []
+
+    n = x.size(0)
+
+    for i in range(n):
+        xi, yi = x[i], y[i]
+
+        same = (y == yi).nonzero(as_tuple=False).flatten()
+        diff = (y != yi).nonzero(as_tuple=False).flatten()
+
+        same = same[same != i]
+
+        if len(same) == 0 or len(diff) == 0:
+            continue
+
+        num_pos = max(1, pairs_per_sample // 2)
+        num_neg = pairs_per_sample - num_pos
+
+        pos_idx = same[torch.randint(len(same), (num_pos,), device=device)]
+        neg_idx = diff[torch.randint(len(diff), (num_neg,), device=device)]
+
+        for j in pos_idx:
+            pair_x.append(torch.stack([xi, x[j]], dim=0))
+            pair_y.append(1)
+
+        for j in neg_idx:
+            pair_x.append(torch.stack([xi, x[j]], dim=0))
+            pair_y.append(0)
+
+    pair_x = torch.stack(pair_x, dim=0)
+    pair_y = torch.tensor(pair_y, device=device, dtype=torch.float32)
+
+    return pair_x, pair_y

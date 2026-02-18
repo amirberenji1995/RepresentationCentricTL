@@ -1,7 +1,7 @@
 ### Best parameters discovery ###
 
 python best_params.py --workers 12
-python best_params.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.1
+python best_params.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_contrastive_ss_None_sp_None.jsonl.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.1
 python best_params.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.05
 python best_params.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.01
 

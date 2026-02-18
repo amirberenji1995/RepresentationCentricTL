@@ -10,6 +10,9 @@ from easy_torchkit.src.training_steps.siamese_training_step import (
     ContrastiveLoss,
     SiameseTrainingStep,
 )
+from easy_torchkit.src.training_steps.dynamic_bootstrapping import (
+    DynamicBootstrappingTrainingStep,
+)
 from sklearn.metrics import accuracy_score
 import torch
 
@@ -65,6 +68,16 @@ training_params_step_dict = {
             "print_every": 1000,
             "stopping_criteria": criteria_list,
         },
-        "dynamic_bootstrapping": {},
+        "dynamic_bootstrapping": {
+            "epochs": 5,
+            "val_size": 0.25,
+            "metrics": [accuracy_metric],
+            "loss_fn": torch.nn.CrossEntropyLoss(reduction="mean"),
+            "optimizer": torch.optim.Adam,
+            "training_step": DynamicBootstrappingTrainingStep(),
+            "phase": TrainingPhaseType.fine_tuning,
+            "print_every": 1000,
+            "stopping_criteria": criteria_list,
+        },
     },
 }

@@ -254,7 +254,16 @@ def execute_routine(routine_key):
                     )
 
                 elif FINE_TUNING_STYLE == "dynamic_bootstrapping":
-                    raise NotImplementedError
+                    ft_params, _, fine_tuning_study = tune_fine_tuning_phase(
+                        best_models_in_routine[src_name],
+                        tgt_name,
+                        x_target_tensor,
+                        y_target,
+                        routine.training_best_params_ranges,
+                        training_params_step_dict["fine_tuning"][
+                            "dynamic_bootstrapping"
+                        ],
+                    )
 
                 else:
                     raise ValueError(

@@ -7,7 +7,7 @@ project_root = os.path.abspath("../../")
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-from core.best_params_finder import make_contrastive_pairs
+from core.utils import make_contrastive_pairs
 from core.experiment_result import ExperimentResult
 from core.routine_registery import ROUTINE_REGISTERY
 from core.utils import (
@@ -293,6 +293,19 @@ def run_routine_experiment(routine_key):
                         ft_model.fit(pair_x, pair_y, ft_params)
                         ft_model.recover_best_model()
                         res.fine_tuning_models[src_name][tgt_name].append(ft_model)
+
+                    elif FINE_TUNING_STYLE == "dynamic_bootstrapping":
+                        ft_model = source_models_in_rep[src_name].copy(
+                            reset_history=False
+                        )
+                        ft_model.fit(x_tgt_ten, y_tgt_ten, ft_params)
+                        ft_model.recover_best_model()
+                        res.fine_tuning_models[src_name][tgt_name].append(ft_model)
+
+                    else:
+                        raise ValueError(
+                            f"Unsupported fine tuning style: {FINE_TUNING_STYLE}"
+                        )
 
                     res.fine_tuning_timing_raw[src_name][tgt_name].append(
                         {
