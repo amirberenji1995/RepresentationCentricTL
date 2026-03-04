@@ -5,6 +5,17 @@ from damavand.damavand.utils import z_score_scaler
 from core.utils import resampler, sequence_data
 from numpy import expand_dims
 
+fine_tuning_search_space = {
+    "supervised": None,
+    "contrastive": {
+        "pairs_per_sample": [1, 2],
+    },
+    "dynamic_bootstrapping": {
+        "warmup_epochs": [5],
+        "bmm_iters": [10],
+    },
+}
+
 general_best_params_ranges = {
     "mfpt": {
         "lr": [0.005, 0.001, 0.0005, 0.0001],

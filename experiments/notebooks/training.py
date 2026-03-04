@@ -7,6 +7,10 @@ project_root = os.path.abspath("../../")
 if project_root not in sys.path:
     sys.path.append(project_root)
 
+from easy_torchkit.src.training_steps.dynamic_bootstrapping import (
+    DynamicBootstrappingTrainingStep,
+)
+
 from core.utils import make_contrastive_pairs
 from core.experiment_result import ExperimentResult
 from core.routine_registery import ROUTINE_REGISTERY
@@ -284,7 +288,7 @@ def run_routine_experiment(routine_key):
                         pair_x, pair_y = make_contrastive_pairs(
                             x_tgt_ten,
                             y_tgt_ten,
-                            pairs_per_sample=best_ft_p.get("pairs_per_sample", 1),
+                            pairs_per_sample=best_ft_p["pairs_per_sample"],
                         )
 
                         ft_model = source_models_in_rep[src_name].copy(
@@ -295,6 +299,11 @@ def run_routine_experiment(routine_key):
                         res.fine_tuning_models[src_name][tgt_name].append(ft_model)
 
                     elif FINE_TUNING_STYLE == "dynamic_bootstrapping":
+                        ft_params.training_step = DynamicBootstrappingTrainingStep(
+                            warmup_epochs=best_ft_p["warmup_epochs"],
+                            bmm_iters=best_ft_p["bmm_iters"],
+                        )
+
                         ft_model = source_models_in_rep[src_name].copy(
                             reset_history=False
                         )

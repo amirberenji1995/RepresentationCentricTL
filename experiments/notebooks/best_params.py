@@ -28,7 +28,7 @@ from core.utils import (
     Routine,
     BestParams,
 )
-from core.routine_registery import ROUTINE_REGISTERY
+from core.routine_registery import ROUTINE_REGISTERY, fine_tuning_search_space
 from core.best_params_finder import tune_source_phase, tune_fine_tuning_phase
 from experiments.notebooks.training_artifacts import training_params_step_dict
 
@@ -251,6 +251,9 @@ def execute_routine(routine_key):
                         y_target,
                         routine.training_best_params_ranges,
                         training_params_step_dict["fine_tuning"]["contrastive"],
+                        fine_tuning_style_search_space=fine_tuning_search_space[
+                            "contrastive"
+                        ],
                     )
 
                 elif FINE_TUNING_STYLE == "dynamic_bootstrapping":
@@ -261,6 +264,9 @@ def execute_routine(routine_key):
                         y_target,
                         routine.training_best_params_ranges,
                         training_params_step_dict["fine_tuning"][
+                            "dynamic_bootstrapping"
+                        ],
+                        fine_tuning_style_search_space=fine_tuning_search_space[
                             "dynamic_bootstrapping"
                         ],
                     )

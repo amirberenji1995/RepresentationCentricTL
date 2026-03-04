@@ -72,20 +72,18 @@ def tune_fine_tuning_phase(
     train_y: torch.Tensor,
     search_space: Dict[str, Dict[str, List[float]]],
     fine_tuning_params_dict: Dict[str, Any],
+    fine_tuning_style_search_space: Dict | None = None,
 ):
     """
     Finds best params for fine-tuning without redundant fitting.
     Returns: (best_params, best_model_object)
     """
-    grid = search_space[target_name]
+    grid = search_space[target_name].copy()
+    if fine_tuning_style_search_space:
+        grid.update(fine_tuning_style_search_space)
     trial_models = {}
 
     def objective(trial):
-
-        print(
-            f"\n\n\n>>> Tuning Fine-Tuning Phase: {fine_tuning_params_dict['training_step']}\n\n\n"
-        )
-
         lr = trial.suggest_categorical("lr", grid["lr"])
         batch_size = trial.suggest_categorical("batch_size", grid["batch_size"])
         if isinstance(fine_tuning_params_dict["training_step"], SupervisedTrainingStep):
@@ -104,6 +102,10 @@ def tune_fine_tuning_phase(
             trial_models[trial.number] = trial_model
             return trial_model.best_val_loss
         elif isinstance(fine_tuning_params_dict["training_step"], SiameseTrainingStep):
+            pairs_per_sample = trial.suggest_categorical(
+                "pairs_per_sample",
+                fine_tuning_style_search_space["pairs_per_sample"],
+            )
             fine_tuning_params_dict.update(
                 {
                     "lr": lr,
@@ -112,9 +114,7 @@ def tune_fine_tuning_phase(
             )
 
             pair_x, pair_y = make_contrastive_pairs(
-                train_x,
-                train_y,
-                pairs_per_sample=fine_tuning_params_dict.get("pairs_per_sample", 1),
+                train_x, train_y, pairs_per_sample=pairs_per_sample
             )
 
             fine_tuning_params = TrainingParams(**fine_tuning_params_dict)
@@ -134,6 +134,16 @@ def tune_fine_tuning_phase(
                 {
                     "lr": lr,
                     "batch_size": batch_size,
+                    "training_step": DynamicBootstrappingTrainingStep(
+                        warmup_epochs=trial.suggest_categorical(
+                            "warmup_epochs",
+                            fine_tuning_style_search_space["warmup_epochs"],
+                        ),
+                        bmm_iters=trial.suggest_categorical(
+                            "bmm_iters",
+                            fine_tuning_style_search_space["bmm_iters"],
+                        ),
+                    ),
                 }
             )
 
@@ -154,5 +164,5 @@ def tune_fine_tuning_phase(
     best_trial_num = study.best_trial.number
     best_model = trial_models[best_trial_num]
     best_model.recover_best_model()
-
+    print(f"\n\n\n>>> DEBGUG: Best Params Found: {study.best_params}\n\n\n")
     return study.best_params, best_model, study
