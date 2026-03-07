@@ -30,7 +30,7 @@ criteria_list = [
 accuracy_metric = EvaluationMetric(name="accuracy", function=accuracy_score)
 
 training_params_dict = {
-    "epochs": 5,
+    "epochs": 1000,
     "val_size": 0.25,
     "metrics": [accuracy_metric],
     "loss_fn": torch.nn.CrossEntropyLoss(reduction="mean"),
@@ -43,7 +43,7 @@ training_params_dict = {
 
 
 fine_tuning_params_dict = {
-    "epochs": 5,
+    "epochs": 1000,
     "val_size": 0.25,
     "metrics": [accuracy_metric],
     "loss_fn": torch.nn.CrossEntropyLoss(reduction="mean"),

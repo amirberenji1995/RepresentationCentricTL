@@ -102,7 +102,7 @@ def execute_routine(routine_key):
     output_dir.mkdir(parents=True, exist_ok=True)
 
     nested_results = {}
-    window_search_space = [10, 20, 100, 200, 400, 800, 1200, 2400]
+    window_search_space = [10, 20, 40, 80, 100, 200, 400, 800, 1200, 2400]
     random_state = np.random.randint(1, 1000)
 
     raw_splits = train_test_splitter(

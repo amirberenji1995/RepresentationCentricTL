@@ -123,14 +123,14 @@ fft_dnn_classifier_args = {
 
 sequencer_args = {
     "Raw -> Scaled -> Sequenced -> LSTM": {
-        "mfpt": {"win_len": 20, "hop_len": 20},
-        "cwru": {"win_len": 20, "hop_len": 20},
-        "kaist": {"win_len": 100, "hop_len": 100},
+        "mfpt": {"win_len": 40, "hop_len": 40},
+        "cwru": {"win_len": 40, "hop_len": 40},
+        "kaist": {"win_len": 80, "hop_len": 80},
     },
     "Raw -> Env -> Scaled -> Sequenced -> LSTM": {
-        "mfpt": {"win_len": 2400, "hop_len": 2400},
+        "mfpt": {"win_len": 1200, "hop_len": 1200},
         "cwru": {"win_len": 20, "hop_len": 20},
-        "kaist": {"win_len": 20, "hop_len": 20},
+        "kaist": {"win_len": 100, "hop_len": 100},
     },
 }
 
