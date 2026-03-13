@@ -1,22 +1,39 @@
 import os
+import sys
+
+project_root = os.path.abspath("../../")
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
+print(project_root)
+
 import re
 from pathlib import Path
 
-from core.utils import process_jsonl_to_dfs, export_to_xlsx
+from core.result_processor import process_jsonl_to_dfs, export_to_xlsx
 
 if __name__ == "__main__":
     files = [
-        "experiments/notebooks/results/results_fs_supervised_ss_None_sp_None/_fs_supervised_ss_None_sp_None.jsonl",
-        "experiments/notebooks/results/results_fs_supervised_ss_percentage_sp_01/_fs_supervised_ss_percentage_sp_01.jsonl",
-        "experiments/notebooks/results/results_fs_supervised_ss_percentage_sp_005/_fs_supervised_ss_percentage_sp_005.jsonl",
-        "experiments/notebooks/results/results_fs_supervised_ss_percentage_sp_001/_fs_supervised_ss_percentage_sp_001.jsonl",
-        "experiments/notebooks/results/results_fs_supervised_ss_shots_per_class_sp_50/_fs_supervised_ss_shots_per_class_sp_50.jsonl",
-        "experiments/notebooks/results/results_fs_supervised_ss_shots_per_class_sp_100/_fs_supervised_ss_shots_per_class_sp_100.jsonl",
-        "experiments/notebooks/results/results_fs_supervised_ss_shots_per_class_sp_150/_fs_supervised_ss_shots_per_class_sp_150.jsonl",
-        "experiments/notebooks/results/results_fs_supervised_ss_shots_per_class_sp_200/_fs_supervised_ss_shots_per_class_sp_200.jsonl",
-        "experiments/notebooks/results/results_fs_supervised_ss_shots_per_class_sp_250/_fs_supervised_ss_shots_per_class_sp_250.jsonl",
+        "results/results_fs_supervised_ss_None_sp_None/_fs_supervised_ss_None_sp_None.jsonl",
+        "results/results_fs_supervised_ss_percentage_sp_01/_fs_supervised_ss_percentage_sp_01.jsonl",
+        "results/results_fs_supervised_ss_percentage_sp_005/_fs_supervised_ss_percentage_sp_005.jsonl",
+        "results/results_fs_supervised_ss_percentage_sp_001/_fs_supervised_ss_percentage_sp_001.jsonl",
+        "results/results_fs_supervised_ss_shots_per_class_sp_50/_fs_supervised_ss_shots_per_class_sp_50.jsonl",
+        "results/results_fs_supervised_ss_shots_per_class_sp_100/_fs_supervised_ss_shots_per_class_sp_100.jsonl",
+        "results/results_fs_supervised_ss_shots_per_class_sp_150/_fs_supervised_ss_shots_per_class_sp_150.jsonl",
+        "results/results_fs_supervised_ss_shots_per_class_sp_200/_fs_supervised_ss_shots_per_class_sp_200.jsonl",
+        "results/results_fs_supervised_ss_shots_per_class_sp_250/_fs_supervised_ss_shots_per_class_sp_250.jsonl",
+        "results/results_fs_dynamic_bootstrapping_ss_None_sp_None/_fs_dynamic_bootstrapping_ss_None_sp_None.jsonl",
+        "results/results_fs_dynamic_bootstrapping_ss_percentage_sp_01/_fs_dynamic_bootstrapping_ss_percentage_sp_01.jsonl",
+        "results/results_fs_dynamic_bootstrapping_ss_percentage_sp_005/_fs_dynamic_bootstrapping_ss_percentage_sp_005.jsonl",
+        "results/results_fs_dynamic_bootstrapping_ss_percentage_sp_001/_fs_dynamic_bootstrapping_ss_percentage_sp_001.jsonl",
+        "results/results_fs_dynamic_bootstrapping_ss_shots_per_class_sp_50/_fs_dynamic_bootstrapping_ss_shots_per_class_sp_50.jsonl",
+        "results/results_fs_dynamic_bootstrapping_ss_shots_per_class_sp_100/_fs_dynamic_bootstrapping_ss_shots_per_class_sp_100.jsonl",
+        "results/results_fs_dynamic_bootstrapping_ss_shots_per_class_sp_150/_fs_dynamic_bootstrapping_ss_shots_per_class_sp_150.jsonl",
+        "results/results_fs_dynamic_bootstrapping_ss_shots_per_class_sp_200/_fs_dynamic_bootstrapping_ss_shots_per_class_sp_200.jsonl",
+        "results/results_fs_dynamic_bootstrapping_ss_shots_per_class_sp_250/_fs_dynamic_bootstrapping_ss_shots_per_class_sp_250.jsonl",
     ]
-    output_dir = "experiments/notebooks/results/summarized/"
+    output_dir = "results/summarized/"
     os.makedirs(output_dir, exist_ok=True)
 
     routine_layout = {

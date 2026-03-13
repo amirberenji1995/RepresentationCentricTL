@@ -150,6 +150,7 @@ def tune_fine_tuning_phase(
             fine_tuning_params = TrainingParams(**fine_tuning_params_dict)
 
             trial_model = model.copy(reset_history=True)
+            # TODO: predict train_y with the trail_model, and fit like trial_model.fit(train_x, train_y_predicted, fine_tuning_params)
             trial_model.fit(train_x, train_y, fine_tuning_params)
 
             trial_models[trial.number] = trial_model

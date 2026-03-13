@@ -307,6 +307,7 @@ def run_routine_experiment(routine_key):
                         ft_model = source_models_in_rep[src_name].copy(
                             reset_history=False
                         )
+                        # TODO: predict train_y with the ft_model, and fit like trial_model.fit(train_x, train_y_predicted, fine_tuning_params)
                         ft_model.fit(x_tgt_ten, y_tgt_ten, ft_params)
                         ft_model.recover_best_model()
                         res.fine_tuning_models[src_name][tgt_name].append(ft_model)

@@ -17,7 +17,7 @@ def process_jsonl_to_dfs(jsonl_path):
             # 1. Source Training Averages (Accuracy)
             src_accs = {
                 src: pd.DataFrame(
-                    [{ds: m["Accuracy"] for ds, m in r.items()} for r in reps]
+                    [{ds: m["accuracy"] for ds, m in r.items()} for r in reps]
                 ).mean()
                 for src, reps in data["results"].items()
             }
@@ -29,7 +29,7 @@ def process_jsonl_to_dfs(jsonl_path):
                 for tgt, reps in targets.items():
                     row = (
                         pd.DataFrame(
-                            [{ds: m["Accuracy"] for ds, m in r.items()} for r in reps]
+                            [{ds: m["accuracy"] for ds, m in r.items()} for r in reps]
                         )
                         .mean()
                         .to_dict()

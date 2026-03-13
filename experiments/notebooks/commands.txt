@@ -1,25 +1,63 @@
 ### Best parameters discovery ###
 
+#   Best Params - whole set, both phases, supervised
 python best_params.py --workers 12
-python best_params.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_contrastive_ss_None_sp_None.jsonl.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.1
-python best_params.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.05
-python best_params.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.01
 
-python best_params.py --phase fine_tuning --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 25
-python best_params.py --phase fine_tuning --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 20
-python best_params.py --phase fine_tuning --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 15
-python best_params.py --phase fine_tuning --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 10
-python best_params.py --phase fine_tuning --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 5
+#   Best Params - whole set, fine_tuning phase, dynamic_bootstrapping
+python best_params.py --workers 12 --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12
+
+#   Best Params - percentage-based subsampled, supervised finetuning
+python best_params.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.1
+python best_params.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.05
+python best_params.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.01
+
+#   Best Params - percentage-based subsampled, dynamic_bootstrapping finetuning
+python best_params.py --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.1
+python best_params.py --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.05
+python best_params.py --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.01
+
+#   Best Params - shots-per-class subsampled, supervised finetuning
+python best_params.py --phase fine_tuning --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 25
+python best_params.py --phase fine_tuning --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 20
+python best_params.py --phase fine_tuning --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 15
+python best_params.py --phase fine_tuning --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 10
+python best_params.py --phase fine_tuning --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 5
+
+#   Best Params - shots-per-class subsampled, dynamic_bootstrapping finetuning
+python best_params.py --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --device cuda:0 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 25
+python best_params.py --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 20
+python best_params.py --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --device cuda:0 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 15
+python best_params.py --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 10
+python best_params.py --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --device cuda:1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style shots_per_class --subsampling_factor 5
 
 ### Full training ###
 
-python training.py --device cuda:0 --workers 12 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params.jsonl
-python training.py --device cuda:0 --workers 12 --subsampling_style percentage --subsampling_factor 0.1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_percentage_sp_01.jsonl
-python training.py --device cuda:1 --workers 12 --subsampling_style percentage --subsampling_factor 0.05 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_percentage_sp_005.jsonl
-python training.py --device cuda:1 --workers 12 --subsampling_style percentage --subsampling_factor 0.01 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_percentage_sp_001.jsonl
+#   Full training - whole set, supervised
+python training.py --device cuda:0 --workers 12 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl
 
-python training.py --device cuda:0 --workers 12 --subsampling_style shots_per_class --subsampling_factor 5 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_shots_per_class_sp_50.jsonl
-python training.py --device cuda:0 --workers 12 --subsampling_style shots_per_class --subsampling_factor 10 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_shots_per_class_sp_100.jsonl
-python training.py --device cuda:0 --workers 12 --subsampling_style shots_per_class --subsampling_factor 15 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_shots_per_class_sp_150.jsonl
-python training.py --device cuda:1 --workers 12 --subsampling_style shots_per_class --subsampling_factor 20 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_shots_per_class_sp_200.jsonl
-python training.py --device cuda:1 --workers 12 --subsampling_style shots_per_class --subsampling_factor 25 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_ds_fine_tuning_fs_supervised_ss_shots_per_class_sp_250.jsonl
+#   Full training - percentage-based subsampled, supervised
+python training.py --device cuda:0 --workers 12 --subsampling_style percentage --subsampling_factor 0.1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_percentage_sp_01.jsonl
+python training.py --device cuda:1 --workers 12 --subsampling_style percentage --subsampling_factor 0.05 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_percentage_sp_005.jsonl
+python training.py --device cuda:1 --workers 12 --subsampling_style percentage --subsampling_factor 0.01 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_percentage_sp_001.jsonl
+
+#   Full training - shots-per-class subsampled, supervised
+python training.py --device cuda:0 --workers 12 --subsampling_style shots_per_class --subsampling_factor 5 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_shots_per_class_sp_50.jsonl
+python training.py --device cuda:0 --workers 12 --subsampling_style shots_per_class --subsampling_factor 10 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_shots_per_class_sp_100.jsonl
+python training.py --device cuda:0 --workers 12 --subsampling_style shots_per_class --subsampling_factor 15 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_shots_per_class_sp_150.jsonl
+python training.py --device cuda:1 --workers 12 --subsampling_style shots_per_class --subsampling_factor 20 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_shots_per_class_sp_200.jsonl
+python training.py --device cuda:1 --workers 12 --subsampling_style shots_per_class --subsampling_factor 25 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_shots_per_class_sp_250.jsonl
+
+#   Full training - whole set, dynamic_bootstrapping
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:1 --workers 12 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_ss_None_sp_None.jsonl
+
+#   Full training - percentage-based subsampled, dynamic_bootstrapping
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:1 --workers 12 --subsampling_style percentage --subsampling_factor 0.1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_ss_percentage_sp_01.jsonl
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:0 --workers 12 --subsampling_style percentage --subsampling_factor 0.05 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_ss_percentage_sp_005.jsonl
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:1 --workers 12 --subsampling_style percentage --subsampling_factor 0.01 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_ss_percentage_sp_001.jsonl
+
+#   Full training - shots_per_class subsampled, dynamic_bootstrapping
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:0 --workers 12 --subsampling_style shots_per_class --subsampling_factor 5 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_ss_shots_per_class_sp_50.jsonl
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:1 --workers 12 --subsampling_style shots_per_class --subsampling_factor 10 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_ss_shots_per_class_sp_100.jsonl
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:0 --workers 12 --subsampling_style shots_per_class --subsampling_factor 15 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_ss_shots_per_class_sp_150.jsonl
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:1 --workers 12 --subsampling_style shots_per_class --subsampling_factor 20 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_ss_shots_per_class_sp_200.jsonl
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:1 --workers 12 --subsampling_style shots_per_class --subsampling_factor 25 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_ss_shots_per_class_sp_250.jsonl

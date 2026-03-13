@@ -69,7 +69,7 @@ training_params_step_dict = {
             "stopping_criteria": criteria_list,
         },
         "dynamic_bootstrapping": {
-            "epochs": 5,
+            "epochs": 1000,
             "val_size": 0.25,
             "metrics": [accuracy_metric],
             "loss_fn": torch.nn.CrossEntropyLoss(reduction="mean"),

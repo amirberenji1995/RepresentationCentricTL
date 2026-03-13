@@ -300,7 +300,7 @@ def execute_routine(routine_key):
             f"_sp_{str(SUBSAMPLING_FACTOR).replace('.', '')}"
         )
         bp.log_to_jsonl(
-            log_file=f"{output_dir}/best_params{p_suffix}.jsonl",
+            log_file=f"{output_dir}best_params{p_suffix}.jsonl",
             exclude=["training_study_details", "fine_tuning_study_details"],
         )
 
