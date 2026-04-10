@@ -11,8 +11,8 @@ fine_tuning_search_space = {
         "pairs_per_sample": [1, 2],
     },
     "dynamic_bootstrapping": {
-        "warmup_epochs": [50],
-        "bmm_iters": [10],
+        "warmup_epochs": [50, 100],
+        "bmm_iters": [10, 50],
     },
 }
 

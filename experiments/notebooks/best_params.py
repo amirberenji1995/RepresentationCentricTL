@@ -89,6 +89,13 @@ parser.add_argument(
     default=3,
     help="Number of routines to run in parallel. Default is 3.",
 )
+
+parser.add_argument(
+    "--gt_label_recovery_rate",
+    type=float,
+    default=0.0,
+    help="The ground truth label recovery rate (only used for db fine-tuning).",
+)
 args = parser.parse_args()
 
 PHASE = args.phase
@@ -98,6 +105,7 @@ SUBSAMPLING_FACTOR = args.subsampling_factor
 FINE_TUNING_STYLE = args.fine_tuning_style
 DEVICE = torch.device(args.device)
 WORKERS = args.workers
+GT_LABEL_RECOVERY_RATE = args.gt_label_recovery_rate
 
 
 # ---------------------------------------------------------
@@ -269,6 +277,7 @@ def execute_routine(routine_key):
                         fine_tuning_style_search_space=fine_tuning_search_space[
                             "dynamic_bootstrapping"
                         ],
+                        gt_label_recovery_rate=GT_LABEL_RECOVERY_RATE,
                     )
 
                 else:
@@ -294,9 +303,18 @@ def execute_routine(routine_key):
             training_study_details=training_study_details,
             fine_tuning_study_details=extract_study_data(fine_tuning_study),
         )
+        # Create the optional segment first
+        recovery_str = (
+            f"_gt_recovery_{str(GT_LABEL_RECOVERY_RATE).replace('.', '')}"
+            if GT_LABEL_RECOVERY_RATE
+            else ""
+        )
+
+        # Assemble the full suffix
         p_suffix = (
-            f"_fs_{str(FINE_TUNING_STYLE)}"
-            f"_ss_{str(SUBSAMPLING_STYLE)}"
+            f"_fs_{FINE_TUNING_STYLE}"
+            f"{recovery_str}"
+            f"_ss_{SUBSAMPLING_STYLE}"
             f"_sp_{str(SUBSAMPLING_FACTOR).replace('.', '')}"
         )
         bp.log_to_jsonl(
@@ -328,6 +346,20 @@ def execute_routine(routine_key):
 if __name__ == "__main__":
     absolute_start_time = time.time()
     routine_keys = list(ROUTINE_REGISTERY.keys())
+    # routine_keys = [
+    #     "raw->scaled->cnn",
+    #     "raw->env->scaled->cnn",
+    #     "raw->fft->scaled->cnn",
+    #     "raw->env->fft->scaled->cnn",
+    # "raw->zoomedfft->scaled->cnn",
+    # "raw->env->zoomedfft->scaled->cnn",
+    # # "raw->zoomedfft->scaled->dnn",
+    # # "raw->env->zoomedfft->scaled->dnn",
+    # "raw->scaled->sequenced->lstm",
+    # "raw->env->scaled->sequenced->lstm",
+    # # "raw->fft->scaled->resampled->dnn",
+    # # "raw->env->fft->scaled->resampled->dnn",
+    # ]
 
     print(f"Launching {len(routine_keys)} routines (Workers: {WORKERS})")
 

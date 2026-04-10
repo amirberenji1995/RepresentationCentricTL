@@ -59,7 +59,7 @@ training_params_step_dict = {
     "fine_tuning": {
         "supervised": fine_tuning_params_dict,
         "contrastive": {
-            "epochs": 5,
+            "epochs": 1000,
             "val_size": 0.25,
             "loss_fn": ContrastiveLoss(margin=1.0),
             "optimizer": torch.optim.Adam,

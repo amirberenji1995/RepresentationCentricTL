@@ -4,7 +4,14 @@
 python best_params.py --workers 12
 
 #   Best Params - whole set, fine_tuning phase, dynamic_bootstrapping
-python best_params.py --workers 12 --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12
+python best_params.py --workers 12 --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl
+
+#   Best Params - whole set, fine_tuning phase, dynamic_bootstrapping, GT_LABEL_RECOVERY_RATE
+python best_params.py --workers 12 --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --gt_label_recovery_rate 0.75
+python best_params.py --workers 6 --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --gt_label_recovery_rate 0.5
+python best_params.py --workers 6 --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --gt_label_recovery_rate 0.25
+python best_params.py --workers 6 --phase fine_tuning --fine_tuning_style dynamic_bootstrapping --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --gt_label_recovery_rate 1.0
+
 
 #   Best Params - percentage-based subsampled, supervised finetuning
 python best_params.py --phase fine_tuning --fine_tuning_style supervised --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_supervised_ss_None_sp_None.jsonl --workers 12 --subsampling_style percentage --subsampling_factor 0.1
@@ -49,6 +56,12 @@ python training.py --device cuda:1 --workers 12 --subsampling_style shots_per_cl
 
 #   Full training - whole set, dynamic_bootstrapping
 python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:1 --workers 12 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_ss_None_sp_None.jsonl
+
+#   Full training - whole set, dynamic_bootstrapping, gt_label_recovery_rate
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:1 --workers 12 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_gt_recovery_10_ss_None_sp_None.jsonl --gt_label_recovery_rate 1.0
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:1 --workers 12 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_gt_recovery_075_ss_None_sp_None.jsonl --gt_label_recovery_rate 0.75
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:0 --workers 6 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_gt_recovery_05_ss_None_sp_None.jsonl --gt_label_recovery_rate 0.5
+python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:1 --workers 6 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_gt_recovery_025_ss_None_sp_None.jsonl --gt_label_recovery_rate 0.25
 
 #   Full training - percentage-based subsampled, dynamic_bootstrapping
 python training.py --fine_tuning_style dynamic_bootstrapping --device cuda:1 --workers 12 --subsampling_style percentage --subsampling_factor 0.1 --best_params_file /home/a/amiber/projects/phme26/experiments/notebooks/results/best_params/best_params_fs_dynamic_bootstrapping_ss_percentage_sp_01.jsonl

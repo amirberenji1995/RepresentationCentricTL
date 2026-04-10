@@ -14,24 +14,19 @@ from core.result_processor import process_jsonl_to_dfs, export_to_xlsx
 
 if __name__ == "__main__":
     files = [
-        "results/results_fs_supervised_ss_None_sp_None/_fs_supervised_ss_None_sp_None.jsonl",
-        "results/results_fs_supervised_ss_percentage_sp_01/_fs_supervised_ss_percentage_sp_01.jsonl",
-        "results/results_fs_supervised_ss_percentage_sp_005/_fs_supervised_ss_percentage_sp_005.jsonl",
-        "results/results_fs_supervised_ss_percentage_sp_001/_fs_supervised_ss_percentage_sp_001.jsonl",
-        "results/results_fs_supervised_ss_shots_per_class_sp_50/_fs_supervised_ss_shots_per_class_sp_50.jsonl",
-        "results/results_fs_supervised_ss_shots_per_class_sp_100/_fs_supervised_ss_shots_per_class_sp_100.jsonl",
-        "results/results_fs_supervised_ss_shots_per_class_sp_150/_fs_supervised_ss_shots_per_class_sp_150.jsonl",
-        "results/results_fs_supervised_ss_shots_per_class_sp_200/_fs_supervised_ss_shots_per_class_sp_200.jsonl",
-        "results/results_fs_supervised_ss_shots_per_class_sp_250/_fs_supervised_ss_shots_per_class_sp_250.jsonl",
+        # "results/results_fs_supervised_ss_None_sp_None/_fs_supervised_ss_None_sp_None.jsonl",
+        # "results/results_fs_supervised_ss_percentage_sp_01/_fs_supervised_ss_percentage_sp_01.jsonl",
+        # "results/results_fs_supervised_ss_percentage_sp_005/_fs_supervised_ss_percentage_sp_005.jsonl",
+        # "results/results_fs_supervised_ss_percentage_sp_001/_fs_supervised_ss_percentage_sp_001.jsonl",
+        # "results/results_fs_supervised_ss_shots_per_class_sp_50/_fs_supervised_ss_shots_per_class_sp_50.jsonl",
+        # "results/results_fs_supervised_ss_shots_per_class_sp_100/_fs_supervised_ss_shots_per_class_sp_100.jsonl",
+        # "results/results_fs_supervised_ss_shots_per_class_sp_150/_fs_supervised_ss_shots_per_class_sp_150.jsonl",
+        # "results/results_fs_supervised_ss_shots_per_class_sp_200/_fs_supervised_ss_shots_per_class_sp_200.jsonl",
+        # "results/results_fs_supervised_ss_shots_per_class_sp_250/_fs_supervised_ss_shots_per_class_sp_250.jsonl",
         "results/results_fs_dynamic_bootstrapping_ss_None_sp_None/_fs_dynamic_bootstrapping_ss_None_sp_None.jsonl",
-        "results/results_fs_dynamic_bootstrapping_ss_percentage_sp_01/_fs_dynamic_bootstrapping_ss_percentage_sp_01.jsonl",
-        "results/results_fs_dynamic_bootstrapping_ss_percentage_sp_005/_fs_dynamic_bootstrapping_ss_percentage_sp_005.jsonl",
-        "results/results_fs_dynamic_bootstrapping_ss_percentage_sp_001/_fs_dynamic_bootstrapping_ss_percentage_sp_001.jsonl",
-        "results/results_fs_dynamic_bootstrapping_ss_shots_per_class_sp_50/_fs_dynamic_bootstrapping_ss_shots_per_class_sp_50.jsonl",
-        "results/results_fs_dynamic_bootstrapping_ss_shots_per_class_sp_100/_fs_dynamic_bootstrapping_ss_shots_per_class_sp_100.jsonl",
-        "results/results_fs_dynamic_bootstrapping_ss_shots_per_class_sp_150/_fs_dynamic_bootstrapping_ss_shots_per_class_sp_150.jsonl",
-        "results/results_fs_dynamic_bootstrapping_ss_shots_per_class_sp_200/_fs_dynamic_bootstrapping_ss_shots_per_class_sp_200.jsonl",
-        "results/results_fs_dynamic_bootstrapping_ss_shots_per_class_sp_250/_fs_dynamic_bootstrapping_ss_shots_per_class_sp_250.jsonl",
+        "results/results_fs_dynamic_bootstrapping_gt_recovery_075_ss_None_sp_None/_fs_dynamic_bootstrapping_gt_recovery_075_ss_None_sp_None.jsonl",
+        "results/results_fs_dynamic_bootstrapping_gt_recovery_05_ss_None_sp_None/_fs_dynamic_bootstrapping_gt_recovery_05_ss_None_sp_None.jsonl",
+        "results/results_fs_dynamic_bootstrapping_gt_recovery_025_ss_None_sp_None/_fs_dynamic_bootstrapping_gt_recovery_025_ss_None_sp_None.jsonl",
     ]
     output_dir = "results/summarized/"
     os.makedirs(output_dir, exist_ok=True)

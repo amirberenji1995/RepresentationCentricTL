@@ -29,6 +29,7 @@ from easy_torchkit.src.contracts.training_params import TrainingParams
 from experiments.notebooks.training_artifacts import training_params_step_dict
 import argparse
 import torch
+import torch.nn.functional as F
 from joblib import Parallel, delayed
 import numpy as np
 import gc
@@ -91,6 +92,13 @@ parser.add_argument(
     default=3,
     help="Number of routines to run in parallel. Default is 3.",
 )
+
+parser.add_argument(
+    "--gt_label_recovery_rate",
+    type=float,
+    default=None,
+    help="The ground truth label recovery rate (only used for db fine-tuning).",
+)
 args = parser.parse_args()
 
 REPS = args.reps
@@ -100,12 +108,22 @@ SUBSAMPLING_FACTOR = args.subsampling_factor
 FINE_TUNING_STYLE = args.fine_tuning_style
 DEVICE = torch.device(args.device)
 WORKERS = args.workers
+GT_LABEL_RECOVERY_RATE = args.gt_label_recovery_rate
+
 
 dataset_names = ["mfpt", "cwru", "kaist"]
 
+recovery_str = (
+    f"_gt_recovery_{str(GT_LABEL_RECOVERY_RATE).replace('.', '')}"
+    if GT_LABEL_RECOVERY_RATE
+    else ""
+)
+
+# Assemble the full suffix
 p_suffix = (
-    f"_fs_{str(FINE_TUNING_STYLE)}"
-    f"_ss_{str(SUBSAMPLING_STYLE)}"
+    f"_fs_{FINE_TUNING_STYLE}"
+    f"{recovery_str}"
+    f"_ss_{SUBSAMPLING_STYLE}"
     f"_sp_{str(SUBSAMPLING_FACTOR).replace('.', '')}"
 )
 output_dir = f"results/results{p_suffix}/"
@@ -307,8 +325,57 @@ def run_routine_experiment(routine_key):
                         ft_model = source_models_in_rep[src_name].copy(
                             reset_history=False
                         )
-                        # TODO: predict train_y with the ft_model, and fit like trial_model.fit(train_x, train_y_predicted, fine_tuning_params)
-                        ft_model.fit(x_tgt_ten, y_tgt_ten, ft_params)
+
+                        # 1. Generate refurbished labels (initial model predictions)
+                        y_tgt_ten_pred = (
+                            F.softmax(ft_model.forward(x_tgt_ten), dim=1)
+                            .argmax(dim=1)
+                            .detach()
+                        )
+
+                        # 2. Setup indices and splits
+                        num_samples = x_tgt_ten.size(0)
+                        split_point = int(num_samples * (1 - ft_params.val_size))
+
+                        # CPU generator for reproducibility across devices
+                        gen = torch.Generator(device="cpu").manual_seed(
+                            ft_model.random_state
+                        )
+                        indices = torch.randperm(num_samples, generator=gen).to(
+                            x_tgt_ten.device
+                        )
+
+                        x_train = x_tgt_ten[indices[:split_point]]
+                        y_train_refurbished = y_tgt_ten_pred[indices[:split_point]]
+
+                        x_val = x_tgt_ten[indices[split_point:]]
+                        y_val_original = y_tgt_ten[indices[split_point:]]
+
+                        # --- GT LABEL RECOVERY LOGIC ---
+                        if GT_LABEL_RECOVERY_RATE is not None:
+                            num_train = x_train.size(0)
+                            # Generate mask on CPU with the shared generator, then move to device
+                            recovery_mask = (
+                                torch.rand(num_train, generator=gen).to(x_train.device)
+                                < GT_LABEL_RECOVERY_RATE
+                            )
+
+                            # Get ground truth for the training indices
+                            y_train_gt = y_tgt_ten[indices[:split_point]]
+
+                            # Inject ground truth into the refurbished labels
+                            y_train_refurbished = torch.where(
+                                recovery_mask, y_train_gt, y_train_refurbished
+                            )
+                        # -------------------------------
+
+                        # 3. Fit the model
+                        ft_model.fit(
+                            x_train,
+                            y_train_refurbished,
+                            ft_params,
+                            eval_set=(x_val, y_val_original),
+                        )
                         ft_model.recover_best_model()
                         res.fine_tuning_models[src_name][tgt_name].append(ft_model)
 

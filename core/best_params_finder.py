@@ -1,6 +1,7 @@
 import optuna
 from optuna.samplers import GridSampler
 import torch
+import torch.nn.functional as F
 from typing import Literal, Dict, List, Any
 from easy_torchkit.src.contracts.training_params import TrainingParams
 from easy_torchkit.src.classification import ClassificationModel
@@ -73,6 +74,7 @@ def tune_fine_tuning_phase(
     search_space: Dict[str, Dict[str, List[float]]],
     fine_tuning_params_dict: Dict[str, Any],
     fine_tuning_style_search_space: Dict | None = None,
+    gt_label_recovery_rate: float | None = None,
 ):
     """
     Finds best params for fine-tuning without redundant fitting.
@@ -148,10 +150,50 @@ def tune_fine_tuning_phase(
             )
 
             fine_tuning_params = TrainingParams(**fine_tuning_params_dict)
-
             trial_model = model.copy(reset_history=True)
-            # TODO: predict train_y with the trail_model, and fit like trial_model.fit(train_x, train_y_predicted, fine_tuning_params)
-            trial_model.fit(train_x, train_y, fine_tuning_params)
+
+            # 1. Get initial refurbished labels (model predictions)
+            train_y_predicted = (
+                F.softmax(trial_model.forward(train_x), dim=1).argmax(dim=1).detach()
+            )
+
+            # 2. Setup splitting
+            num_samples = train_x.size(0)
+            split_point = int(num_samples * (1 - fine_tuning_params.val_size))
+
+            gen = torch.Generator(device="cpu").manual_seed(model.random_state)
+            indices = torch.randperm(num_samples, generator=gen).to(train_x.device)
+
+            # 3. Create the standard splits
+            x_train_split = train_x[indices[:split_point]]
+            y_train_refurbished = train_y_predicted[indices[:split_point]]
+
+            x_val_split = train_x[indices[split_point:]]
+            y_val_original = train_y[indices[split_point:]]
+
+            # --- GT LABEL RECOVERY LOGIC ---
+            if gt_label_recovery_rate != 0.0:
+                # Determine which training samples to recover from ground truth
+                num_train = x_train_split.size(0)
+                # Generate a mask (on CPU first to match generator)
+                recovery_mask = (
+                    torch.rand(num_train, generator=gen) < gt_label_recovery_rate
+                )
+                recovery_mask = recovery_mask.to(train_x.device)
+
+                # Get the ground truth labels for the training split
+                y_train_gt = train_y[indices[:split_point]]
+
+                # Replace refurbished with GT where mask is True
+                y_train_refurbished = torch.where(
+                    recovery_mask, y_train_gt, y_train_refurbished
+                )
+            trial_model.fit(
+                x_train_split,
+                y_train_refurbished,
+                fine_tuning_params,
+                eval_set=(x_val_split, y_val_original),
+            )
 
             trial_models[trial.number] = trial_model
             return trial_model.best_val_loss
