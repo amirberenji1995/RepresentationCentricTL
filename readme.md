@@ -2,7 +2,12 @@ This is the official repository for:
 
 **Evaluation of Input Presentation in Transfer Learning for Bearing Fault Detection**
 
-submitted to the [PHME2026](https://phm-europe.org/) and currently under review.
+submitted to the [PHME2026](https://phm-europe.org/) and accepted as an oral presentation.
+
+In this study, [Damavand](https://pydamavand.github.io/documentation/) was used for all the steps related to the data; from downloading and structurizing the datasets to preprocessings. 
+## Abstract
+
+Transfer learning is a promising technique to overcome data insufficiency, a noticeable barrier to real-world application of intelligent maintenance solutions. Although the importance of data preparation and preprocessing is widely acknowledged, no study in particular has investigated the effect of vibration data input presentations on transferability capabilities. This study aims to fill in this gap by conducting experiments across three benchmark datasets to evaluate direct transfer, catastrophic forgetting and data efficiency for bearing fault classification. Moreover, we explore the opportunity to employ source model pseudo-labeling to reduce the need for data labeled by human experts. Our findings show that not only does the choice of preprocessing pipeline significantly affect target-set performance, but also that the vulnerability to catastrophic forgetting varies accordingly. Thus, we conclude that finding the right data processing routine is also a key component in achieving supreme transfer learning performance and, indeed, it deserves more attention. The code base of this study is open-sourced and made publicly available to support reproducibility, transparency, and further research.
 
 ## Research questions and findings
 
@@ -59,20 +64,29 @@ To fully address the research questions mentioned above, we implemented followin
 
 ## Results
 
-In this section, I go over a small portion of our results, supporting our findings corresponding to the reasearch questions mentioned above:
+In this section, I go over a small portion of our results, supporting our findings corresponding to the reasearch questions mentioned above; you can find are full detailed results, [here](https://github.com/caisr-hh/RepresentationCentricTL/tree/Main/experiments/notebooks/results).
 
-1. Following figure, visualizes the pre-fine-tuning ”base” performance (yellow), the post-fine-tuning target accuracy (blue), and the relative performance degradation on the source set, commonly referred to as catastrophic forgetting (red). These results indicate that the choice of routine significantly influences the generalizability of learned features.
+1. **Does preprocessing, affect transferability?**: Following figure, visualizes the pre-fine-tuning ”base” performance (yellow), the post-fine-tuning target accuracy (blue), and the relative performance degradation on the source set, commonly referred to as catastrophic forgetting (red). These results indicate that the choice of routine significantly influences the generalizability of learned features.
 
     <img src="experiments/notebooks/results/polar_charts/_fs_supervised_ss_None_sp_None.png" alt="Alt Text" height="700">
 
-2. To evaluate the data-efficiency of the pipelines, we repeated the same experiments for different volumes of the fine-tuning data; following figure includes performance for the case 10 shots-per-class is visualized. Although the the fine-tuning set consists only 30 samples, still a number of the routines manage to get competitive results for some of the source-target pairs.
+2. **Is data efficiency preprocessing-dependent?**: To evaluate the data-efficiency of the pipelines, we repeated the same experiments for different volumes of the fine-tuning data; following figure includes performance for the case 10 shots-per-class is visualized. Although the the fine-tuning set consists only 30 samples, still a number of the routines manage to get competitive results for some of the source-target pairs.
 
     <img src="experiments/notebooks/results/polar_charts/_fs_supervised_ss_shots_per_class_sp_100.png" alt="Alt Text" height="700">
 
-3. In our last set of experiments, we went for exploring the possiblity of replacing ground-truth labels with pseudo-labels from the source model; following images show training purely on pseudo-labels (left) and training on the mixture of pseudo-labels and ground-truth labels with a ratio of 0.25:0.75 (right). While the training on pure pseudo-labels shows no possiblity, *R7*, *R11* and *R12* show competitive results, bringing up the opportunity to reduce the labeling budget by 25%.
+3. **Can we replace target labels with pseudo-labels?**: In our last set of experiments, we went for exploring the possiblity of replacing ground-truth labels with pseudo-labels from the source model; following images show training purely on pseudo-labels (left) and training on the mixture of pseudo-labels and ground-truth labels with a ratio of 0.25:0.75 (right). While the training on pure pseudo-labels shows no possiblity, *R7*, *R11* and *R12* show competitive results, bringing up the opportunity to reduce the labeling budget by 25%.
 
     <div style="display: flex; justify-content: space-around; align-items: center;">
     <img src="experiments/notebooks/results/polar_charts/_fs_dynamic_bootstrapping_ss_None_sp_None.png" alt="First Image" height="650">
     <img src="experiments/notebooks/results/polar_charts/_fs_dynamic_bootstrapping_gt_recovery_075_ss_None_sp_None.png" alt="Second Image" height="650">
     </div>
 
+## Reproducing the results
+To repeat our experiments, you need to run each of [`best_params.py`](experiments/notebooks/best_params.py) and [`training.py`](experiments/notebooks/training.py), using the commands presented in [`commands.txt`](experiments/notebooks/commands.txt); the first file discovers the best hyperparameters to train models and the second one runs the experiments repeatedly to exclude the effect of randomness.
+
+## Citation
+We kindly ask you to cite the paper as below upon any use of the contents provided on this page or using [Damavand](https://pydamavand.github.io/documentation/) on your studies:
+
+```
+TBA
+```
